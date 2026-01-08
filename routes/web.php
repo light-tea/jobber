@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\JobController;
+use App\Http\Controllers\ApplicationController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -22,5 +24,7 @@ Route::get('/jobs/{id}', [JobController::class, 'show']);
 Route::get('/', function () {
     return redirect('/jobs');
 });
+Route::post('/apply', [ApplicationController::class, 'store'])->name('apply.job');
+
 
 // });

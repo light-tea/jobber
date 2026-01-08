@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>Job Listings</title>
     <style>
         * {
@@ -416,22 +417,46 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- <div class="container">
         <div class="header">
             <h1>Job Listings</h1>
             <p>Find your next opportunity</p>
         </div>
 
         <div class="main-grid">
-            <!-- Jobs List -->
             <div class="jobs-list" id="jobsList"></div>
 
-            <!-- Job Details -->
             <div class="job-details" id="jobDetails">
                 <div class="placeholder">Select a job to view details</div>
             </div>
         </div>
+    </div> -->
+
+    <div class="container">
+    <div class="header">
+        <h1>Job Listings</h1>
+        <p>Find your next opportunity</p>
     </div>
+
+    <div class="main-grid">
+
+        <!-- LEFT COLUMN -->
+        <div>
+            <div class="jobs-list" id="jobsList"></div>
+
+            <!-- Pagination -->
+            <div class="mt-4 d-flex justify-content-center">
+                {{ $jobs->links() }}
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="job-details" id="jobDetails">
+            <div class="placeholder">Select a job to view details</div>
+        </div>
+
+    </div>
+</div>
 
     <!-- Apply Modal -->
     <div class="modal" id="applyModal">
@@ -475,7 +500,7 @@
 
                 <div class="modal-actions">
                     <button class="cancel-btn" onclick="closeModal()">Cancel</button>
-                    <button class="submit-btn" onclick="sendEmail()">
+                    <button class="submit-btn" onclick="submitApplication()">
                         ✉ Send Application
                     </button>
                 </div>
@@ -485,14 +510,35 @@
 
     <script>
         // Job Data
-        let jobs = @json($jobs);
+        let jobs = @json($jobs->items());
 
-        let selectedJob = null;
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             renderJobsList();
         });
+
+        function validateForm() {
+            if (!selectedJob) {
+                alert('Please select a job first');
+                return false;
+            }
+
+            if (!fullName.value || !email.value || !coverLetter.value) {
+                alert('Please fill all required fields');
+                return false;
+            }
+
+            if (coverLetter.value.length < 20) {
+                alert('Cover letter must be at least 20 characters');
+                return false;
+            }
+
+            return true;
+        }
+
+        function submitApplication() {
+            if (!validateForm()) return;
+                sendEmail();
+        }
 
         function renderJobsList() {
             const jobsList = document.getElementById('jobsList');
@@ -624,11 +670,6 @@
             const email = document.getElementById('email').value;
             const phone = document.getElementById('phone').value;
             const coverLetter = document.getElementById('coverLetter').value;
-
-            if (!fullName || !email || !coverLetter) {
-                showStatus('✗ Please fill in all required fields (marked with *)', 'error');
-                return;
-            }
 
             try {
                 const response = await fetch('https://api.anthropic.com/v1/messages', {

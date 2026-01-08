@@ -8,11 +8,10 @@ use App\Models\Job;
 class JobController extends Controller
 {
     public function index()
-{
-    $jobs = Job::all();
-
-    return view('jobs.index', compact('jobs'));
-}
+    {
+        $jobs = Job::paginate(5);
+        return view('jobs.index', compact('jobs'));
+    }
 
 
     public function show($id)
